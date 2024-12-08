@@ -17,6 +17,8 @@ esp_err_t TCA9535Init(void)
 
 	int i2c_master_port = I2C_MASTER_NUM;
 	i2c_config_t conf;
+	
+	memset(&conf, 0, sizeof(i2c_config_t));
 
 	conf.mode = I2C_MODE_MASTER;
 	conf.sda_io_num = I2C_MASTER_SDA_IO;
@@ -54,7 +56,7 @@ unsigned char TCA9535ReadSingleRegister(tca9535_reg_t address)
 	i2c_master_write_byte(cmd, ( TCA9535_ADDRESS << 1 ) | READ_BIT, ACK_CHECK_EN);
 	i2c_master_read_byte(cmd, &reg_data, NACK_VAL);
 	i2c_master_stop(cmd);
-	i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 100 / portTICK_RATE_MS);
+	i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 100 / portTICK_PERIOD_MS);
 	i2c_cmd_link_delete(cmd);
 
 	return reg_data;
@@ -82,7 +84,7 @@ esp_err_t TCA9535WriteSingleRegister(tca9535_reg_t address, unsigned short regVa
 	i2c_master_write_byte(cmd, regVal, ACK_CHECK_EN);
 
 	i2c_master_stop(cmd);
-	ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 100 / portTICK_RATE_MS);
+	ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 100 / portTICK_PERIOD_MS);
 	i2c_cmd_link_delete(cmd);
 
 	return ret;
@@ -108,7 +110,7 @@ esp_err_t TCA9535ReadStruct(TCA9535_Register *reg, tca9535_reg_t reg_num)
 	i2c_master_write_byte(cmd, ( TCA9535_ADDRESS << 1 ) | READ_BIT, ACK_CHECK_EN);
 	i2c_master_read(cmd, (uint8_t*) &reg->asInt, 2, NACK_VAL);
 	i2c_master_stop(cmd);
-	ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 100 / portTICK_RATE_MS);
+	ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 100 / portTICK_PERIOD_MS);
 	i2c_cmd_link_delete(cmd);
 
 	return ret;
@@ -134,7 +136,7 @@ esp_err_t TCA9535WriteStruct(TCA9535_Register *reg, tca9535_reg_t reg_num)
 	i2c_master_write_byte(cmd, reg_num, ACK_CHECK_EN);
 	i2c_master_write(cmd, reg_data, 2, ACK_VAL);
 	i2c_master_stop(cmd);
-	ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 100 / portTICK_RATE_MS);
+	ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 100 / portTICK_PERIOD_MS);
 	i2c_cmd_link_delete(cmd);
 
 	return ret;
